@@ -4,10 +4,13 @@ import os
 import pickle
 
 
-# Load model and tokenizer
+import os
+print(f"Current working directory: {os.getcwd()}")
+
+
 @st.cache_resource
 def load_model():
-    model_path = "checkpoints/llm_checkpoints/dpo_video_and_content_instruct_beta=0.1_r=32_guideline"
+    model_path = "./checkpoints/llm_checkpoints/dpo_video_and_content_instruct_beta=0.1_r=32_guideline"
     model = AutoModelForCausalLM.from_pretrained(model_path)
 
     tokenizer = AutoTokenizer.from_pretrained(model_path)
@@ -18,7 +21,7 @@ def load_model():
 
 tokenizer, model = load_model()
 
-guideline_path = "checkpoints/guideline_extraction_outputs/whole_training_data/llama_3.2_3b_epoch2.pkl"
+guideline_path = "./checkpoints/guideline_extraction_outputs/whole_training_data/llama_3.2_3b_epoch2.pkl"
 guideline_results = pickle.load(open(guideline_path,'rb'))
 guidelines = guideline_results['best_rational']
 
