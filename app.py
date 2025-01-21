@@ -1,16 +1,12 @@
 import streamlit as st
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import os
+import os.path 
 import pickle
-
-
-import os
-print(f"Current working directory: {os.getcwd()}")
-
 
 @st.cache_resource
 def load_model():
-    model_path = "./checkpoints/llm_checkpoints/dpo_video_and_content_instruct_beta=0.1_r=32_guideline"
+    model_path = os.path.join("checkpoints", "llm_checkpoints", "dpo_video_and_content_instruct_beta=0.1_r=32_guideline-ckpt2500")
     model = AutoModelForCausalLM.from_pretrained(model_path)
 
     tokenizer = AutoTokenizer.from_pretrained(model_path)
@@ -50,9 +46,8 @@ st.write("Write a catchy headline from content and video summary.")
 
 # Inputs for content and video summary
 content = st.text_area("Enter the article content:", placeholder="Type the main content of the article here...")
-video_summary = st.text_area("Enter the video summary:", placeholder="Type the summary of the video related to the article...")
+video_summary = st.text_area("Enter the summary of the article's accompanying video (optional):", placeholder="Type the summary of the video related to the article...")
 
-# guideline = st.checkbox("Use Guidelines", value=True)
 if st.button("Generate Headline"):
     if content.strip():
         if not video_summary.strip():
@@ -60,15 +55,16 @@ if st.button("Generate Headline"):
         prompt = process_prompt(tokenizer, content, video_summary, guidelines)
         inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=1024)
         
-        outputs = model.generate(**inputs, 
-                               max_length=60, 
-                               num_return_sequences=5,
-                               do_sample=True,
-                               temperature=0.7)
-        
-        st.write("### Generated Headlines:")
-        for i, output in enumerate(outputs):
-            response = tokenizer.decode(output, skip_special_tokens=True)
-            st.write(f"{i+1}. {response}")
+        st.write("### Generated 5 Potential Headlines:")
+        for i in range(5):
+            st.write(f"### Headline {i+1}")
+            outputs = model.generate(**inputs,
+                                   max_new_tokens=60,
+                                   num_return_sequences=1, 
+                                   do_sample=True,
+                                   temperature=0.7)
+            response = tokenizer.decode(outputs[0][inputs['input_ids'].shape[1]:], skip_special_tokens=True)
+            response = response.replace('"', '')
+            st.write(f"{response}")
     else:
         st.write("Please enter a valid prompt.")
