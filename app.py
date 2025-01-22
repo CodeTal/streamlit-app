@@ -1,15 +1,20 @@
 import streamlit as st
 from transformers import AutoModelForCausalLM, AutoTokenizer
+from peft import PeftModel
 import os
 import os.path 
 import pickle
 
+hf_token = "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"
+
 @st.cache_resource
 def load_model():
-    model_path = os.path.join("checkpoints", "llm_checkpoints", "dpo_video_and_content_instruct_beta=0.1_r=32_guideline-ckpt2500")
-    model = AutoModelForCausalLM.from_pretrained(model_path)
+    base_model_path = 'meta-llama/Llama-3.2-3B-Instruct'
+    lora_model_path = os.path.join("checkpoints", "llm_checkpoints", "dpo_video_and_content_instruct_beta=0.1_r=32_guideline-ckpt2500")
+    base_model = AutoModelForCausalLM.from_pretrained(base_model_path, use_auth_token=hf_token)
+    model = PeftModel.from_pretrained(base_model, lora_model_path)
 
-    tokenizer = AutoTokenizer.from_pretrained(model_path)
+    tokenizer = AutoTokenizer.from_pretrained(base_model_path)
     tokenizer.pad_token = tokenizer.eos_token
     tokenizer.padding_side='left'
 
