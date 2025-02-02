@@ -10,7 +10,7 @@ hf_token = "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"
 @st.cache_resource
 def load_model():
     base_model_path = 'meta-llama/Llama-3.2-3B-Instruct'
-    lora_model_path = os.path.join("checkpoints", "llm_checkpoints", "dpo_video_and_content_instruct_beta=0.1_r=32_guideline-ckpt2500")
+    lora_model_path = os.path.join("checkpoints", "llm_checkpoints", "dpo_video_and_content_instruct_beta=0.1_r=32_new_guideline_ckpt4000")
     base_model = AutoModelForCausalLM.from_pretrained(base_model_path, use_auth_token=hf_token)
     model = PeftModel.from_pretrained(base_model, lora_model_path)
 
@@ -22,7 +22,7 @@ def load_model():
 
 tokenizer, model = load_model()
 
-guideline_path = "./checkpoints/guideline_extraction_outputs/whole_training_data/llama_3.2_3b_epoch2.pkl"
+guideline_path = "./checkpoints/guideline_extraction_outputs/llama_3.2_3b_epoch2_iteration50.pkl"
 guideline_results = pickle.load(open(guideline_path,'rb'))
 guidelines = guideline_results['best_rational']
 
