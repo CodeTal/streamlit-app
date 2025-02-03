@@ -14,7 +14,7 @@ def load_model():
     base_model = AutoModelForCausalLM.from_pretrained(base_model_path, use_auth_token=hf_token)
     model = PeftModel.from_pretrained(base_model, lora_model_path)
 
-    tokenizer = AutoTokenizer.from_pretrained(base_model_path)
+    tokenizer = AutoTokenizer.from_pretrained(base_model_path, use_auth_token=hf_token)
     tokenizer.pad_token = tokenizer.eos_token
     tokenizer.padding_side='left'
 
