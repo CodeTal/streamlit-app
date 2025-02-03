@@ -61,14 +61,18 @@ if st.button("Generate Headline"):
         inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=1024)
         
         st.write("### Generated 5 Potential Headlines:")
-        for i in range(5):
+        
+        # Generate 5 headlines in parallel
+        outputs = model.generate(**inputs,
+                               max_new_tokens=60,
+                               num_return_sequences=5,
+                               do_sample=True, 
+                               temperature=0.7)
+        
+        # Process all outputs
+        for i, output in enumerate(outputs):
             st.write(f"### Headline {i+1}")
-            outputs = model.generate(**inputs,
-                                   max_new_tokens=60,
-                                   num_return_sequences=1, 
-                                   do_sample=True,
-                                   temperature=0.7)
-            response = tokenizer.decode(outputs[0][inputs['input_ids'].shape[1]:], skip_special_tokens=True)
+            response = tokenizer.decode(output[inputs['input_ids'].shape[1]:], skip_special_tokens=True)
             response = response.replace('"', '')
             st.write(f"{response}")
     else:
